@@ -33,4 +33,11 @@ void EthernetClass::begin(uint8_t *mac, uint8_t *ip, uint8_t *gateway, uint8_t *
   W5100.setSubnetMask(subnet);
 }
 
+uint8_t *EthernetClass::read_ip_address()
+{
+  static uint8_t buf[5];
+  W5100.readSIPR(buf);
+  return buf;
+}
+
 EthernetClass Ethernet;

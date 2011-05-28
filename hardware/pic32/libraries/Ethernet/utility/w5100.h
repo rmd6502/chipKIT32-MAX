@@ -10,8 +10,11 @@
 #ifndef	W5100_H_INCLUDED
 #define	W5100_H_INCLUDED
 
-#include <avr/pgmspace.h>
-#include <SPI.h>
+//#include <avr/pgmspace.h>
+#include <SoftSPI.h>
+#include <stdint.h>
+
+#define _BV(x) (1ul << x)
 
 #define MAX_SOCK_NUM 4
 
@@ -308,16 +311,22 @@ private:
   uint16_t RBASE[SOCKETS]; // Rx buffer base address
 
 private:
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+ #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
   inline static void initSS()    { DDRB  |=  _BV(4); };
   inline static void setSS()     { PORTB &= ~_BV(4); };
   inline static void resetSS()   { PORTB |=  _BV(4); };
-#else
+#elif defined(__AVR_MEGA__)
   inline static void initSS()    { DDRB  |=  _BV(2); };
   inline static void setSS()     { PORTB &= ~_BV(2); };
   inline static void resetSS()   { PORTB |=  _BV(2); };
+#elif defined(__PIC32MX__)
+  inline static void initSS()    { LATDSET = _BV(4); TRISDCLR = _BV(4); ODCDCLR = _BV(4); LATDSET = _BV(4); };
+  inline static void setSS()     { LATDCLR = _BV(4); };
+  inline static void resetSS()   { LATDSET = _BV(4); };
+#else
+#error unsupported architecture!
 #endif
-
+ 
 };
 
 extern W5100Class W5100;

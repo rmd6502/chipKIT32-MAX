@@ -9,7 +9,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <avr/interrupt.h>
+#include <wiring.h>
+//#include <avr/interrupt.h>
 
 #include "w5100.h"
 
@@ -27,7 +28,7 @@ void W5100Class::init(void)
 {
   delay(300);
 
-  SPI.begin();
+  SoftSPI.begin();
   initSS();
   
   writeMR(1<<RST);
@@ -103,10 +104,10 @@ void W5100Class::recv_data_processing(SOCKET s, uint8_t *data, uint16_t len, uin
 void W5100Class::read_data(SOCKET s, volatile uint8_t *src, volatile uint8_t *dst, uint16_t len)
 {
   uint16_t size;
-  uint16_t src_mask;
+  uint32_t src_mask;
   uint16_t src_ptr;
 
-  src_mask = (uint16_t)src & RMASK;
+  src_mask = (uint32_t)src & RMASK;
   src_ptr = RBASE[s] + src_mask;
 
   if( (src_mask + len) > RSIZE ) 
@@ -124,10 +125,10 @@ void W5100Class::read_data(SOCKET s, volatile uint8_t *src, volatile uint8_t *ds
 uint8_t W5100Class::write(uint16_t _addr, uint8_t _data)
 {
   setSS();  
-  SPI.transfer(0xF0);
-  SPI.transfer(_addr >> 8);
-  SPI.transfer(_addr & 0xFF);
-  SPI.transfer(_data);
+  SoftSPI.transfer(0xF0);
+  SoftSPI.transfer(_addr >> 8);
+  SoftSPI.transfer(_addr & 0xFF);
+  SoftSPI.transfer(_data);
   resetSS();
   return 1;
 }
@@ -137,11 +138,11 @@ uint16_t W5100Class::write(uint16_t _addr, uint8_t *_buf, uint16_t _len)
   for (uint16_t i=0; i<_len; i++)
   {
     setSS();    
-    SPI.transfer(0xF0);
-    SPI.transfer(_addr >> 8);
-    SPI.transfer(_addr & 0xFF);
+    SoftSPI.transfer(0xF0);
+    SoftSPI.transfer(_addr >> 8);
+    SoftSPI.transfer(_addr & 0xFF);
     _addr++;
-    SPI.transfer(_buf[i]);
+    SoftSPI.transfer(_buf[i]);
     resetSS();
   }
   return _len;
@@ -150,10 +151,10 @@ uint16_t W5100Class::write(uint16_t _addr, uint8_t *_buf, uint16_t _len)
 uint8_t W5100Class::read(uint16_t _addr)
 {
   setSS();  
-  SPI.transfer(0x0F);
-  SPI.transfer(_addr >> 8);
-  SPI.transfer(_addr & 0xFF);
-  uint8_t _data = SPI.transfer(0);
+  SoftSPI.transfer(0x0F);
+  SoftSPI.transfer(_addr >> 8);
+  SoftSPI.transfer(_addr & 0xFF);
+  uint8_t _data = SoftSPI.transfer(0);
   resetSS();
   return _data;
 }
@@ -163,11 +164,11 @@ uint16_t W5100Class::read(uint16_t _addr, uint8_t *_buf, uint16_t _len)
   for (uint16_t i=0; i<_len; i++)
   {
     setSS();
-    SPI.transfer(0x0F);
-    SPI.transfer(_addr >> 8);
-    SPI.transfer(_addr & 0xFF);
+    SoftSPI.transfer(0x0F);
+    SoftSPI.transfer(_addr >> 8);
+    SoftSPI.transfer(_addr & 0xFF);
     _addr++;
-    _buf[i] = SPI.transfer(0);
+    _buf[i] = SoftSPI.transfer(0);
     resetSS();
   }
   return _len;

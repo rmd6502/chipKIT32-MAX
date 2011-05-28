@@ -16,6 +16,7 @@ public:
   void begin(uint8_t *, uint8_t *);
   void begin(uint8_t *, uint8_t *, uint8_t *);
   void begin(uint8_t *, uint8_t *, uint8_t *, uint8_t *);
+  uint8_t *read_ip_address();
   friend class Client;
   friend class Server;
 };
