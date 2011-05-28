@@ -12,8 +12,8 @@ BYTE SoftSPIClass::transfer(BYTE _data) {
   BYTE val;
 
   for (BYTE i = 0; i < 8; ++i) {
-    digitalWrite(_SCKpin, HIGH);
     digitalWrite(_MOSIpin, (_data & bitnum) ? HIGH : LOW);
+    digitalWrite(_SCKpin, HIGH);
     val = digitalRead(_MISOpin);
     digitalWrite(_SCKpin, LOW);
     ret <<= 1;
